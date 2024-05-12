@@ -38,7 +38,7 @@ dict_unidades
 app2 = Dash(__name__)
 
 app2.layout = html.Div([
-    html.H1('Diagrama de dispersión',style={'textAlign':'center'}),
+    html.H1('Diagrama de dispersión',style={'textAlign':'center', 'font-size': '40px', 'font-weight': 'bold'}),
     html.P("Selecciona los distintos atributos a comparar y año. Si no aparecen puntos en el diagrama de dispersión es porque no existen datos para esos atributos y año concreto."),
     html.P("Atributo eje X:"),
     dcc.Dropdown(
@@ -67,7 +67,15 @@ app2.layout = html.Div([
     ),html.P("Año:"),
     dcc.Slider(df.year.min(), df.year.max(), step=1, value=2010, marks=None,id='my-slider2' ,
     tooltip={"placement": "bottom", "always_visible": True}),
-    dcc.Graph(id="graph2")
+    dcc.Graph(id="graph2"), 
+    html.P('Series temporales',style={'textAlign':'center', 'font-size': '40px', 'font-weight': 'bold'}),   
+    html.P("Selecciona atributo y países a comparar:"),html.P("Atributo a mostrar:"),
+        dcc.Dropdown(id="dropdown11",options=atributos_num, value='population', clearable=False,), html.P("País 1:"),
+        dcc.Dropdown(id="dropdown12",options=countries,value='Spain',clearable=False,),html.P("País 2:"),
+        dcc.Dropdown(id="dropdown13",options=countries_none,value='None',clearable=False,),html.P("País 3:"),
+        dcc.Dropdown(id="dropdown14",options=countries_none,value='None',clearable=False,),html.P("País 4:"),
+        dcc.Dropdown(id="dropdown15",options=countries_none,value='None',clearable=False,),
+        dcc.Graph(id="graph1")   
 ],style={'color': '#002a77'})
 
 
@@ -76,7 +84,7 @@ app2.layout = html.Div([
     Input("dropdown21", "value"),Input("dropdown22", "value"),
     Input("dropdown23", "value"),Input("dropdown24", "value"))
 
-def dispersion(year,atributo_x="population", atributo_y="gdp", atributo_tamaño="gdp per capita",
+def grafica2(year,atributo_x="population", atributo_y="gdp", atributo_tamaño="gdp per capita",
                atributo_color="electricity_demand"):
     df_year=df[df.year==year]
     df_year=df_year[np.logical_not(np.isnan(df_year[atributo_tamaño]))]
@@ -92,6 +100,23 @@ def dispersion(year,atributo_x="population", atributo_y="gdp", atributo_tamaño=
     fig2.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGrey')
     return fig2
 
+@app2.callback(
+    Output("graph1", "figure"),
+    Input("dropdown11", "value"),Input("dropdown12", "value"),Input("dropdown13", "value"),Input("dropdown14", "value"),
+    Input("dropdown15", "value"))
+
+def grafica1(atributo="population",country1="Spain", country2="None",country3="None",country4="None"):
+    df_countries=df[(df.country==country1)|(df.country==country2)|(df.country==country3)|(df.country==country4)]
+    fig1 = px.line(df_countries,x="year",y=atributo,color='country',  
+                  labels={
+                     "year": "year",
+                     atributo: f'{atributo} ({dict_unidades[atributo]})'},
+                  title=f'Temporal series of {atributo}', width=1600,height=600) 
+    fig1.update_layout(plot_bgcolor="white")
+    fig1.update_xaxes(showgrid=True, gridwidth=1, gridcolor='LightGrey')
+    fig1.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGrey')
+     
+    return  fig1
 
 
 
@@ -99,13 +124,10 @@ if __name__ == '__main__':  app2.run_server(debug=False)
 
 
 
-# (host='127.0.0.1', port='7080', proxy=None,
-                                    # debug=False, dev_tools_ui=None, dev_tools_props_check=None,
-                                    # dev_tools_serve_dev_bundles=None, dev_tools_hot_reload=None,
-                                    # dev_tools_hot_reload_interval=None, dev_tools_hot_reload_watch_interval=None,
-                                    # dev_tools_hot_reload_max_retry=None, dev_tools_silence_routes_logging=None,
-                                    # dev_tools_prune_errors=None)
 
 
 
 
+        
+        
+        
